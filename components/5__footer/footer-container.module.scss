@@ -1,0 +1,11 @@
+@import '../../styles/variables.scss';
+
+.footer {
+  margin-top: 4rem;
+  background-color: $primary;
+  color: $base;
+
+  a {
+    color: $base;
+  }
+}
