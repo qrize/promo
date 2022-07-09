@@ -8,7 +8,7 @@ $neutral: rgb(252, 212, 95);
 /* Transitions */
 $trans-duration: 100ms;
 $trans-func: ease-out;
-$trans: background-color opacity $trans-duration $trans-func;
+$trans: all $trans-duration $trans-func;
 
 /* Other */
 $max_content_width: 800px;
