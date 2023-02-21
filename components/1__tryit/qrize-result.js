@@ -3,7 +3,7 @@ import Qrize from 'qrize';
 import iconHtml from '../utils/icon';
 import styles from './scss/qrize-result.module.scss';
 
-const REDIRECTOR_ENDPOINT = 'https://qrize.me/<hash>';
+const REDIRECTOR_ENDPOINT = 'https://qrize.me/f/p/r/<hash>';
 
 // See: https://blog.qrstuff.com/2011/11/23/qr-code-minimum-size
 const QR_CODE_SIZES = [
