@@ -51,6 +51,7 @@ const App = ({ Component, pageProps }) => {
         <meta name="robots" content="index,follow" />
         <meta name="viewport" content="width=device-width" />
         <meta name="author" content="Serhii Holinei" />
+        <link rel="shortcut icon" href="/favicon.ico" />
       </Head>
 
       <Component {...pageProps} />
