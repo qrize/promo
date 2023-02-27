@@ -15,7 +15,7 @@ const HowToUseContainer = () => (
       {` <script src="https://unpkg.com/qrize/dist/qrize.umd.js"></script>`}
     </SyntaxHighlighter>
 
-    <p>Then include following script somewhere:</p>
+    <p>Then include following script:</p>
     <SyntaxHighlighter language="javascript" style={okaidia}>
       {`import Qrize from "qrize";
 
@@ -27,7 +27,7 @@ qrize.createImg({ url: "http://example.com" });`}
 
     <p>
       {
-        'That\'s it. Now an element wih "qr-target" id contains tiny QR code that leads to the url you specified.'
+        'That\'s it. Now an element with "qr-target" id contains a tiny QR code image that leads to the url you specified.'
       }
     </p>
   </section>
