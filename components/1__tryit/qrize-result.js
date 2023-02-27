@@ -44,7 +44,13 @@ function getQRCodeSizeFromUrl({ length }) {
 class QrizeResult extends Component {
   constructor() {
     super();
-    this.state = { url: '', visible: false, time: null };
+    this.state = {
+      url: '',
+      visible: false,
+      time: null,
+      isPending: false,
+      pendingHintVisible: false,
+    };
   }
 
   componentDidMount() {
@@ -68,6 +74,11 @@ class QrizeResult extends Component {
 
   getQR(url) {
     const startTime = performance.now();
+    this.setState({ isPending: true });
+    const pendingHintTimeout = setTimeout(() => {
+      this.setState({ pendingHintVisible: true });
+    }, 1000);
+
     this.qrize.createImg({
       url,
       onSuccess: ({ hash }) => {
@@ -76,98 +87,126 @@ class QrizeResult extends Component {
         const time = Math.round(performance.now() - startTime);
         const minificationRatio =
           getQRCodeSizeFromUrl(this.props.url) / getQRCodeSizeFromUrl(redirectorUrl);
+
         this.setState({
           visible: true,
           redirectorUrl,
           time,
           minificationRatio,
+          isPending: false,
+          pendingHintVisible: false,
         });
+        clearTimeout(pendingHintTimeout);
         this.props.onQRStatusUpdate(null);
       },
       onFailure: (errorStatus, errorText) => {
         this.props.onQRStatusUpdate({ errorStatus, errorText });
+        this.setState({ isPending: false, pendingHintVisible: false });
+        clearTimeout(pendingHintTimeout);
       },
     });
   }
 
   render() {
     return (
-      <div
-        className={`${styles['qr-holder']} ${this.state.visible ? '' : styles['hide']}`}
-        tabIndex="0"
-      >
-        <figure>
-          <div id="qr-target" />
-          <figcaption className={styles['details']}>
-            {/* short link */}
-            <dl className={styles['details-group']}>
-              <dt>
-                <span
-                  className={styles['glyph']}
-                  aria-label="Short link"
-                  dangerouslySetInnerHTML={iconHtml('link-2', {
-                    width: 16,
-                    height: 16,
-                  })}
-                />
-              </dt>
-              <dd title="Short link that leads to the original url">
-                <a href={this.state.redirectorUrl} target="_blank" rel="noopener noreferrer">
-                  {this.state.redirectorUrl}
-                </a>
-              </dd>
-            </dl>
-            {/* time taken */}
-            <dl className={styles['details-group']}>
-              <dt>
-                <span
-                  className={styles['glyph']}
-                  aria-label="Time taken"
-                  dangerouslySetInnerHTML={iconHtml('zap', {
-                    width: 18,
-                    height: 18,
-                  })}
-                />
-              </dt>
-              <dd title={`It took ${this.state.time}ms to shorten a link and render a QR code`}>
-                Rendered in {this.state.time}ms
-              </dd>
-            </dl>
-            {/* times smaller */}
-            <dl className={styles['details-group']}>
-              <dt>
-                <span
-                  className={styles['glyph']}
-                  aria-label="Times smaller"
-                  dangerouslySetInnerHTML={iconHtml('minimize-2', {
-                    width: 18,
-                    height: 18,
-                  })}
-                />
-              </dt>
-              <dd
-                title={
-                  this.state.minificationRatio > 1
-                    ? `Qrized QR code is ${this.state.minificationRatio} times smaller than regular`
-                    : 'The size of a minified QR code is the same as of regular'
-                }
-              >
-                {this.state.minificationRatio}x smaller
-                {this.state.minificationRatio > 1 ? '' : ' (try longer url)'}
-              </dd>
-            </dl>
-          </figcaption>
-        </figure>
-        <span className={styles['hint']}>
-          <span
-            dangerouslySetInnerHTML={iconHtml('corner-left-up', {
-              width: 18,
-              height: 18,
-            })}
-          />
-          <span>Hover to see details</span>
-        </span>
-      </div>
+      <>
+        {this.state.isPending ? (
+          <div className={styles['loaderWrap']}>
+            <div
+              className={styles['loader']}
+              dangerouslySetInnerHTML={iconHtml('loader', {
+                width: 32,
+                height: 32,
+              })}
+            ></div>
+
+            <span
+              className={`${styles['hint']} ${
+                this.state.pendingHintVisible ? styles['visible'] : ''
+              }`}
+            >
+              <span>...serverless cold start 😅</span>
+            </span>
+          </div>
+        ) : null}
+
+        <div
+          className={`${styles['qr-holder']} ${this.state.visible ? '' : styles['hide']}`}
+          tabIndex="0"
+        >
+          <figure>
+            <div id="qr-target" />
+            <figcaption className={styles['details']}>
+              {/* short link */}
+              <dl className={styles['details-group']}>
+                <dt>
+                  <span
+                    className={styles['glyph']}
+                    aria-label="Short link"
+                    dangerouslySetInnerHTML={iconHtml('link-2', {
+                      width: 16,
+                      height: 16,
+                    })}
+                  />
+                </dt>
+                <dd title="Short link that leads to the original url">
+                  <a href={this.state.redirectorUrl} target="_blank" rel="noopener noreferrer">
+                    {this.state.redirectorUrl}
+                  </a>
+                </dd>
+              </dl>
+              {/* time taken */}
+              <dl className={styles['details-group']}>
+                <dt>
+                  <span
+                    className={styles['glyph']}
+                    aria-label="Time taken"
+                    dangerouslySetInnerHTML={iconHtml('zap', {
+                      width: 18,
+                      height: 18,
+                    })}
+                  />
+                </dt>
+                <dd title={`It took ${this.state.time}ms to shorten a link and render a QR code`}>
+                  Rendered in {this.state.time}ms
+                </dd>
+              </dl>
+              {/* times smaller */}
+              <dl className={styles['details-group']}>
+                <dt>
+                  <span
+                    className={styles['glyph']}
+                    aria-label="Times smaller"
+                    dangerouslySetInnerHTML={iconHtml('minimize-2', {
+                      width: 18,
+                      height: 18,
+                    })}
+                  />
+                </dt>
+                <dd
+                  title={
+                    this.state.minificationRatio > 1
+                      ? `Qrized QR code is ${this.state.minificationRatio} times smaller than regular`
+                      : 'The size of a minified QR code is the same as of regular'
+                  }
+                >
+                  {this.state.minificationRatio}x smaller
+                  {this.state.minificationRatio > 1 ? '' : ' (try longer url)'}
+                </dd>
+              </dl>
+            </figcaption>
+          </figure>
+          <span className={styles['hint']}>
+            <span
+              dangerouslySetInnerHTML={iconHtml('corner-left-up', {
+                width: 18,
+                height: 18,
+              })}
+            />
+            <span>Hover to see details</span>
+          </span>
+        </div>
+      </>
     );
   }
 }
