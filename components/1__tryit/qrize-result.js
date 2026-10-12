@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import Qrize from 'qrize';
 import iconHtml from '../utils/icon';
+import * as gtag from '../../lib/gtag';
 import styles from './scss/qrize-result.module.scss';
 
 const REDIRECTOR_ENDPOINT = 'https://qrize.me/f/p/r/<hash>';
@@ -99,8 +100,10 @@ class QrizeResult extends Component {
         });
         clearTimeout(pendingHintTimeout);
         this.props.onQRStatusUpdate(null);
+        gtag.event({ action: 'qr_created', category: 'qrize', value: time });
       },
       onFailure: (errorStatus, errorText) => {
+        gtag.event({ action: 'qr_failed', category: 'qrize', label: String(errorStatus) });
         this.props.onQRStatusUpdate({ errorStatus, errorText });
         this.setState({ isPending: false, pendingHintVisible: false });
         clearTimeout(pendingHintTimeout);
