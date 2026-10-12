@@ -85,8 +85,9 @@ class QrizeResult extends Component {
         console.debug('QR code has been built');
         const redirectorUrl = REDIRECTOR_ENDPOINT.replace('<hash>', hash);
         const time = Math.round(performance.now() - startTime);
-        const minificationRatio =
-          getQRCodeSizeFromUrl(this.props.url) / getQRCodeSizeFromUrl(redirectorUrl);
+        const minificationRatio = Number(
+          (getQRCodeSizeFromUrl(this.props.url) / getQRCodeSizeFromUrl(redirectorUrl)).toFixed(2),
+        );
 
         this.setState({
           visible: true,
